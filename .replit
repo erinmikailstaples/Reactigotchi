@@ -30,6 +30,10 @@ externalPort = 3002
 localPort = 5173
 externalPort = 80
 
+[[ports]]
+localPort = 37265
+externalPort = 3001
+
 [agent]
 expertMode = true
 integrations = ["javascript_database:1.0.0"]
