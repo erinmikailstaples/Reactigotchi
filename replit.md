@@ -14,6 +14,11 @@ This is a Tamagotchi-style virtual pet game built as a React web application fea
 - Redesigned alien with larger, more prominent nerdy glasses
 - Renamed to "Reactigotchi!" with React/JavaScript themed feeding animations
 - Optimized layout to fit everything on screen without scrolling (320px canvas, compact UI)
+- Added PostgreSQL database with Drizzle ORM for persistent high score storage
+- Built Express backend server with REST API endpoints for high scores
+- Implemented Top 10 scoreboard with 3-letter initials submission
+- Added optional email collection for high score notifications (emails are not displayed publicly)
+- Created scoreboard overlay that shows after mini-game completion if player makes Top 10
 
 # User Preferences
 
@@ -21,14 +26,41 @@ Preferred communication style: Simple, everyday language.
 
 # System Architecture
 
+## Backend Architecture
+
+**Technology Stack**: Node.js + Express + PostgreSQL
+- **Express Server**: RESTful API running on port 3000
+- **Database**: PostgreSQL (Neon) for persistent high score storage
+- **ORM**: Drizzle ORM for type-safe database operations
+
+**API Endpoints**:
+- `GET /api/highscores` - Retrieves top 10 high scores (excludes email addresses)
+- `POST /api/highscores` - Submits a new high score with initials and optional email
+- `GET /api/check-highscore/:score` - Checks if a score qualifies for Top 10
+
+**Database Schema**:
+- Table: `high_scores`
+  - `id`: Serial primary key
+  - `initials`: VARCHAR(3) - 3-letter initials (stored in uppercase)
+  - `score`: Integer - player's game score
+  - `email`: VARCHAR(255) - optional email (not displayed publicly)
+  - `created_at`: Timestamp - when the score was achieved
+
+**Security Considerations**:
+- Email addresses are stored but never returned in public API responses
+- Input validation on initials (exactly 3 characters) and score (positive integer)
+- CORS enabled for frontend-backend communication
+
 ## Frontend Architecture
 
 **Technology Stack**: React 18 with Vite bundler
 - **Rationale**: Vite provides extremely fast Hot Module Replacement (HMR) and optimized builds, making the development experience smooth and productive
 - **Component Structure**: The application is organized into distinct UI components:
-  - `GameUI.jsx` - Manages the pet's statistics display with animated progress bars
+  - `GameUI.jsx` - Manages the pet's statistics display with animated progress bars and action buttons
   - `MiniGame.jsx` - Handles interactive mini-games for earning points/improving stats
+  - `Scoreboard.jsx` - Modal overlay for displaying Top 10 scores and submitting new high scores
   - `Tamagotchi.jsx` - Main container component that orchestrates the overall game state
+  - `AlienCanvas.jsx` - Canvas-based rendering of the pixel art alien character
   - `App.jsx` - Root application component
 
 **Rendering Strategy**: Canvas-based rendering for the pet character
@@ -105,12 +137,24 @@ Preferred communication style: Simple, everyday language.
 - Loaded via CDN for retro typography
 - **Rationale**: Authentic pixel-game aesthetic without bundling font files
 
-## No Backend Dependencies
+## Server Dependencies
 
-The application is entirely client-side with no:
-- Database connections
-- API integrations
-- Authentication systems
-- Server-side rendering
+**Backend (Node.js)**:
+- `express` (v5.1.0) - Web framework for REST API
+- `cors` (v2.8.5) - Cross-origin resource sharing middleware
+- `@neondatabase/serverless` (v1.0.2) - PostgreSQL client for Neon database
+- `drizzle-orm` (v0.44.7) - TypeScript ORM for database operations
+- `drizzle-kit` (v0.31.6) - Schema migration and push utilities
+- `ws` (v8.18.3) - WebSocket library required by Neon serverless
 
-All game state is maintained in the browser session. Future enhancements could add localStorage for persistence or a backend for high scores/multi-player features.
+## Development Workflows
+
+**Two concurrent workflows**:
+1. `dev` - Frontend Vite dev server on port 5000 (webview output)
+2. `server` - Backend Express API server on port 3000 (console output)
+
+**Database Commands**:
+- `npm run db:push` - Push schema changes to database (no manual migrations needed)
+
+**Proxy Configuration**:
+- Vite proxies `/api/*` requests to backend server on localhost:3000

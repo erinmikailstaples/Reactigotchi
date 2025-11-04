@@ -1,6 +1,6 @@
 import './GameUI.css';
 
-export default function GameUI({ hunger, happiness, cleanliness, onFeed, onClean, onPlay }) {
+export default function GameUI({ hunger, happiness, cleanliness, onFeed, onClean, onPlay, onViewScoreboard }) {
   const getBarColor = (value) => {
     if (value > 60) return '#00ff88';
     if (value > 30) return '#ffaa00';
@@ -62,6 +62,9 @@ export default function GameUI({ hunger, happiness, cleanliness, onFeed, onClean
         </button>
         <button className="action-btn play-btn" onClick={onPlay}>
           📚 Play Game
+        </button>
+        <button className="action-btn scores-btn" onClick={onViewScoreboard}>
+          🏆 Scores
         </button>
       </div>
     </div>
