@@ -1,18 +1,24 @@
 import { useState, useEffect, useRef } from 'react';
 import './MiniGame.css';
 
-const GAME_DURATION = 15000;
-const SPAWN_INTERVAL = 1500;
+const INITIAL_SPAWN_INTERVAL = 1500;
+const MIN_SPAWN_INTERVAL = 400;
+const SPEEDUP_RATE = 0.9;
 
 export default function MiniGame({ onGameEnd }) {
   const [items, setItems] = useState([]);
   const [score, setScore] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(GAME_DURATION / 1000);
+  const [strikes, setStrikes] = useState(0);
   const [gameEnded, setGameEnded] = useState(false);
+  const [currentSpeed, setCurrentSpeed] = useState(INITIAL_SPAWN_INTERVAL);
   const nextIdRef = useRef(0);
+  const spawnIntervalRef = useRef(null);
+  const speedupIntervalRef = useRef(null);
 
   useEffect(() => {
-    const spawnInterval = setInterval(() => {
+    if (gameEnded) return;
+
+    const spawnItem = () => {
       const isBook = Math.random() > 0.4;
       const itemId = nextIdRef.current;
       nextIdRef.current += 1;
@@ -28,24 +34,36 @@ export default function MiniGame({ onGameEnd }) {
       setTimeout(() => {
         setItems(prev => prev.filter(item => item.id !== itemId));
       }, 3000);
-    }, SPAWN_INTERVAL);
+    };
 
-    const timerInterval = setInterval(() => {
-      setTimeLeft(prev => {
-        const newTime = prev - 0.1;
-        if (newTime <= 0) {
-          setGameEnded(true);
-          return 0;
-        }
-        return newTime;
+    const startSpawning = (interval) => {
+      if (spawnIntervalRef.current) {
+        clearInterval(spawnIntervalRef.current);
+      }
+      spawnIntervalRef.current = setInterval(spawnItem, interval);
+    };
+
+    startSpawning(currentSpeed);
+
+    speedupIntervalRef.current = setInterval(() => {
+      setCurrentSpeed(prev => {
+        const newSpeed = Math.max(MIN_SPAWN_INTERVAL, prev * SPEEDUP_RATE);
+        startSpawning(newSpeed);
+        return newSpeed;
       });
-    }, 100);
+    }, 3000);
 
     return () => {
-      clearInterval(spawnInterval);
-      clearInterval(timerInterval);
+      if (spawnIntervalRef.current) clearInterval(spawnIntervalRef.current);
+      if (speedupIntervalRef.current) clearInterval(speedupIntervalRef.current);
     };
-  }, []);
+  }, [currentSpeed, gameEnded]);
+
+  useEffect(() => {
+    if (strikes >= 3) {
+      setGameEnded(true);
+    }
+  }, [strikes]);
 
   useEffect(() => {
     if (gameEnded) {
@@ -59,7 +77,7 @@ export default function MiniGame({ onGameEnd }) {
     if (item.type === 'book') {
       setScore(prev => prev + 1);
     } else {
-      setScore(prev => Math.max(0, prev - 1));
+      setStrikes(prev => prev + 1);
     }
     setItems(prev => prev.filter(i => i.id !== item.id));
   };
@@ -70,7 +88,7 @@ export default function MiniGame({ onGameEnd }) {
         <h2>Click the Books! Avoid the Worms!</h2>
         <div className="game-stats">
           <span className="game-score">Score: {score}</span>
-          <span className="game-timer">Time: {timeLeft.toFixed(1)}s</span>
+          <span className="game-strikes">Strikes: {strikes}/3</span>
         </div>
       </div>
       
