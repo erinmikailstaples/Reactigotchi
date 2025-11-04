@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 
-const CANVAS_WIDTH = 400;
-const CANVAS_HEIGHT = 400;
+const CANVAS_WIDTH = 320;
+const CANVAS_HEIGHT = 320;
 
 export default function AlienCanvas({ isSad, isJumping, hasBrainRot, hasPoop, onClick }) {
   const canvasRef = useRef(null);
@@ -66,19 +66,33 @@ export default function AlienCanvas({ isSad, isJumping, hasBrainRot, hasPoop, on
       drawPixel(centerX + 5, centerY - 5, bodyColor);
       drawPixel(centerX + 5, centerY - 4, bodyColor);
       
-      for (let x = -2; x <= 2; x++) {
+      for (let x = -3; x <= -1; x++) {
+        drawPixel(centerX + x, centerY - 6, glassesColor);
         drawPixel(centerX + x, centerY - 5, glassesColor);
+        drawPixel(centerX + x, centerY - 4, glassesColor);
       }
-      drawPixel(centerX - 3, centerY - 5, glassesColor);
-      drawPixel(centerX + 3, centerY - 5, glassesColor);
+      for (let x = 1; x <= 3; x++) {
+        drawPixel(centerX + x, centerY - 6, glassesColor);
+        drawPixel(centerX + x, centerY - 5, glassesColor);
+        drawPixel(centerX + x, centerY - 4, glassesColor);
+      }
+      
+      drawPixel(centerX - 4, centerY - 6, glassesColor);
+      drawPixel(centerX - 4, centerY - 5, glassesColor);
+      drawPixel(centerX - 4, centerY - 4, glassesColor);
+      drawPixel(centerX + 4, centerY - 6, glassesColor);
+      drawPixel(centerX + 4, centerY - 5, glassesColor);
+      drawPixel(centerX + 4, centerY - 4, glassesColor);
+      
+      drawPixel(centerX, centerY - 5, glassesColor);
       
       if (!isBlinking) {
+        drawPixel(centerX - 2, centerY - 5, eyeColor);
         drawPixel(centerX - 2, centerY - 4, eyeColor);
-        drawPixel(centerX - 1, centerY - 4, eyeColor);
-        drawPixel(centerX + 1, centerY - 4, eyeColor);
+        drawPixel(centerX + 2, centerY - 5, eyeColor);
         drawPixel(centerX + 2, centerY - 4, eyeColor);
         
-        drawPixel(centerX - 1, centerY - 4, pupilColor);
+        drawPixel(centerX - 2, centerY - 4, pupilColor);
         drawPixel(centerX + 2, centerY - 4, pupilColor);
       }
       

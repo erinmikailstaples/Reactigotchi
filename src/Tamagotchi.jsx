@@ -19,6 +19,7 @@ export default function Tamagotchi() {
   const [isJumping, setIsJumping] = useState(false);
   const [showMiniGame, setShowMiniGame] = useState(false);
   const [hasPoop, setHasPoop] = useState(false);
+  const [feedingIcons, setFeedingIcons] = useState([]);
 
   const isCritical = hunger < CRITICAL_THRESHOLD || 
                      happiness < CRITICAL_THRESHOLD || 
@@ -43,6 +44,19 @@ export default function Tamagotchi() {
   const handleFeed = () => {
     setHunger(Math.min(MAX_STAT, hunger + 25));
     setHappiness(Math.min(MAX_STAT, happiness + 5));
+    
+    const icon = Math.random() > 0.5 ? '⚛️' : 'JS';
+    const newIcon = {
+      id: Date.now(),
+      icon: icon,
+      x: Math.random() * 60 + 20,
+      y: 50
+    };
+    setFeedingIcons(prev => [...prev, newIcon]);
+    
+    setTimeout(() => {
+      setFeedingIcons(prev => prev.filter(i => i.id !== newIcon.id));
+    }, 1500);
   };
 
   const handleClean = () => {
@@ -68,19 +82,33 @@ export default function Tamagotchi() {
 
   return (
     <div className="tamagotchi-container">
-      <h1 className="title">Nerdy Alien Tamagotchi</h1>
+      <h1 className="title">Reactigotchi!</h1>
       
       {showMiniGame ? (
         <MiniGame onGameEnd={handleGameEnd} />
       ) : (
         <>
-          <AlienCanvas 
-            isSad={isCritical}
-            isJumping={isJumping}
-            hasBrainRot={isCritical}
-            hasPoop={hasPoop}
-            onClick={handleAlienClick}
-          />
+          <div className="alien-area">
+            <AlienCanvas 
+              isSad={isCritical}
+              isJumping={isJumping}
+              hasBrainRot={isCritical}
+              hasPoop={hasPoop}
+              onClick={handleAlienClick}
+            />
+            {feedingIcons.map(item => (
+              <div
+                key={item.id}
+                className="feeding-icon"
+                style={{
+                  left: `${item.x}%`,
+                  top: `${item.y}%`
+                }}
+              >
+                {item.icon}
+              </div>
+            ))}
+          </div>
           
           <GameUI
             hunger={hunger}

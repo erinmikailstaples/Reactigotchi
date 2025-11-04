@@ -11,6 +11,9 @@ This is a Tamagotchi-style virtual pet game built as a React web application fea
 - Added brain rot visual effect for critically low stats
 - Applied retro 8-bit styling with Press Start 2P font and gradient backgrounds
 - Fixed stale closure bug in mini-game to ensure proper score tracking
+- Redesigned alien with larger, more prominent nerdy glasses
+- Renamed to "Reactigotchi!" with React/JavaScript themed feeding animations
+- Optimized layout to fit everything on screen without scrolling (320px canvas, compact UI)
 
 # User Preferences
 
