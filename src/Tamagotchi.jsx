@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import AlienCanvas from './AlienCanvas';
 import GameUI from './GameUI';
 import MiniGame from './MiniGame';
+import Scoreboard from './Scoreboard';
 import './Tamagotchi.css';
 
 const MAX_STAT = 100;
@@ -20,6 +21,8 @@ export default function Tamagotchi() {
   const [showMiniGame, setShowMiniGame] = useState(false);
   const [hasPoop, setHasPoop] = useState(false);
   const [feedingIcons, setFeedingIcons] = useState([]);
+  const [showScoreboard, setShowScoreboard] = useState(false);
+  const [finalScore, setFinalScore] = useState(undefined);
 
   const isCritical = hunger < CRITICAL_THRESHOLD || 
                      happiness < CRITICAL_THRESHOLD || 
@@ -73,6 +76,13 @@ export default function Tamagotchi() {
     const happinessBoost = score * 5;
     setHappiness(Math.min(MAX_STAT, happiness + happinessBoost));
     setShowMiniGame(false);
+    setFinalScore(score);
+    setShowScoreboard(true);
+  };
+
+  const handleViewScoreboard = () => {
+    setFinalScore(undefined);
+    setShowScoreboard(true);
   };
 
   const handleAlienClick = () => {
@@ -117,8 +127,16 @@ export default function Tamagotchi() {
             onFeed={handleFeed}
             onClean={handleClean}
             onPlay={handlePlay}
+            onViewScoreboard={handleViewScoreboard}
           />
         </>
+      )}
+      
+      {showScoreboard && (
+        <Scoreboard 
+          onClose={() => setShowScoreboard(false)}
+          finalScore={finalScore}
+        />
       )}
     </div>
   );

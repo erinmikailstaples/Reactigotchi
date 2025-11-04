@@ -109,3 +109,8 @@
   background: linear-gradient(180deg, #ffd93d 0%, #f9ca24 100%);
   color: #333;
 }
+
+.scores-btn {
+  background: linear-gradient(180deg, #a55eea 0%, #8854d0 100%);
+  color: #fff;
+}
